@@ -1,0 +1,43 @@
+Enunciado
+Título do Projeto: Flappy Bird - Cometas e Moedas
+
+Descrição: Este projeto é uma versão do clássico jogo Flappy Bird, onde o jogador controla um pássaro que deve evitar cometas enquanto coleta moedas. O jogo é construído em Python usando a biblioteca Pygame e tem como objetivo proporcionar uma experiência divertida e desafiadora.
+
+Funcionalidades:
+
+Controle do pássaro com a tecla SPACE para pular e DOWN para descer.
+Coleta de moedas para aumentar a pontuação.
+Evitar cometas que aparecem aleatoriamente.
+Exibição da pontuação e moedas coletadas.
+Tela de Game Over com a opção de reiniciar pressionando a tecla R.
+Requisitos:
+
+Python 3.x
+Biblioteca Pygame
+Como Executar:
+
+Certifique-se de ter o Python 3.x instalado.
+Instale a biblioteca Pygame utilizando o comando: pip install pygame.
+Baixe ou clone o repositório do projeto.
+Execute o arquivo main.py.
+
+# Flappy Bird - Cometas e Moedas
+
+Este projeto é uma versão do clássico jogo Flappy Bird, onde o jogador controla um pássaro que deve evitar cometas enquanto coleta moedas. O jogo é construído em Python usando a biblioteca Pygame e tem como objetivo proporcionar uma experiência divertida e desafiadora.
+
+## Funcionalidades
+- Controle do pássaro com a tecla `SPACE` para pular e `DOWN` para descer.
+- Coleta de moedas para aumentar a pontuação.
+- Evitar cometas que aparecem aleatoriamente.
+- Exibição da pontuação e moedas coletadas.
+- Tela de Game Over com a opção de reiniciar pressionando a tecla `R`.
+
+## Requisitos
+- Python 3.x
+- Biblioteca Pygame
+
+## Como Executar
+1. Certifique-se de ter o Python 3.x instalado.
+2. Instale a biblioteca Pygame utilizando o comando:
+   ```bash
+   pip install pygame

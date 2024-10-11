@@ -1,0 +1,224 @@
+import pygame
+import random
+
+# Inicializando o Pygame
+pygame.init()
+pygame.font.init()  # Inicializa o sistema de fontes do Pygame
+
+# Definindo as cores
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# Dimensões da janela
+WIDTH = 500
+HEIGHT = 700
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('Flappy Bird - Cometas e Moedas')
+
+# Definindo o FPS (frames por segundo)
+FPS = 60
+clock = pygame.time.Clock()
+
+# Função para carregar imagens
+def load_image(path):
+    try:
+        image = pygame.image.load(path)
+        return image
+    except pygame.error as e:
+        print(f"Erro ao carregar a imagem {path}: {e}")
+        return None
+
+# Carregando as imagens
+background_image = load_image('C:/Users/Aluno06/Downloads/galaxia.jfif')
+bird_image = load_image('C:/Users/Aluno06/Downloads/image-removebg-preview.png')
+comet1_image = load_image('C:/Users/Aluno06/Downloads/image-removebg-preview (1).png')
+comet2_image = load_image('C:/Users/Aluno06/Downloads/image-removebg-preview (2).png')
+coin_image = load_image('C:/Users/Aluno06/Downloads/plata.png')
+
+# Redimensionando as imagens
+bird_image = pygame.transform.scale(bird_image, (120, 90)) if bird_image else None
+comet1_image = pygame.transform.scale(comet1_image, (150, 150)) if comet1_image else None
+comet2_image = pygame.transform.scale(comet2_image, (140, 140)) if comet2_image else None
+coin_image = pygame.transform.scale(coin_image, (40, 40)) if coin_image else None
+
+# Definindo as variáveis do jogo
+bird_x = 50
+bird_y = HEIGHT // 2
+bird_velocity = 0
+gravity = 0.5
+jump = -10
+
+# Velocidades dos cometas
+comet1_velocity = -6
+comet2_velocity = -7
+
+score = 0
+coins_collected = 0
+game_over = False
+game_started = False
+
+# Função para gerar novos cometas
+def create_comet(bird_y):
+    while True:
+        comet_y = random.randint(0, HEIGHT - 150)
+        if abs(comet_y - bird_y) > 150:  # Distância mínima entre o pássaro e os cometas
+            comet_type = random.choice([1, 2])
+            return {'x': WIDTH, 'y': comet_y, 'type': comet_type}
+
+# Função para gerar novas moedas
+def create_coin():
+    coin_y = random.randint(0, HEIGHT - 40)
+    return {'x': WIDTH, 'y': coin_y}
+
+# Função para desenhar o pássaro
+def draw_bird():
+    if bird_image:
+        screen.blit(bird_image, (bird_x, bird_y))
+
+# Função para desenhar os cometas
+def draw_comet(comet):
+    if comet['type'] == 1 and comet1_image:
+        screen.blit(comet1_image, (comet['x'], comet['y']))
+    elif comet2_image:
+        screen.blit(comet2_image, (comet['x'], comet['y']))
+
+# Função para desenhar moedas
+def draw_coin(coin):
+    if coin_image:
+        screen.blit(coin_image, (coin['x'], coin['y']))
+
+# Função para verificar colisão
+def check_collision(comet):
+    if (bird_x + 120 > comet['x'] and bird_x < comet['x'] + (150 if comet['type'] == 1 else 140)):
+        if (bird_y + 90 > comet['y'] and bird_y < comet['y'] + (150 if comet['type'] == 1 else 140)):
+            return True
+    return False
+
+# Função para verificar coleta de moedas
+def check_coin_collision(coin):
+    if (bird_x + 120 > coin['x'] and bird_x < coin['x'] + 40):
+        if (bird_y + 90 > coin['y'] and bird_y < coin['y'] + 40):
+            return True
+    return False
+
+# Função para exibir as instruções iniciais
+def show_instructions():
+    screen.fill(BLACK)  # Preenchendo a tela de fundo com preto
+    font = pygame.font.SysFont(None, 50)
+    title_text = font.render('Flappy Bird - Cometas e Moedas', True, WHITE)
+    screen.blit(title_text, [WIDTH // 10, HEIGHT // 4])
+
+    font = pygame.font.SysFont(None, 35)
+    instructions_text1 = font.render('Press SPACE to jump', True, WHITE)
+    instructions_text2 = font.render('Press DOWN to descend', True, WHITE)
+    instructions_text3 = font.render('Avoid the comets and collect coins', True, WHITE)
+    instructions_text4 = font.render('Press ENTER to start', True, WHITE)
+    screen.blit(instructions_text1, [WIDTH // 6, HEIGHT // 2])
+    screen.blit(instructions_text2, [WIDTH // 6, HEIGHT // 2 + 40])
+    screen.blit(instructions_text3, [WIDTH // 8, HEIGHT // 2 + 80])
+    screen.blit(instructions_text4, [WIDTH // 5, HEIGHT // 2 + 120])
+
+    pygame.display.update()
+
+# Função principal do jogo
+def game():
+    global bird_y, bird_velocity, score, coins_collected, game_over, game_started
+
+    comets = [create_comet(bird_y)]
+    coins = [create_coin()]
+
+    while not game_started:
+        show_instructions()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    game_started = True
+
+    while True:
+        screen.blit(background_image, (0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not game_over:
+                    bird_velocity = jump
+                if event.key == pygame.K_DOWN and not game_over:
+                    bird_velocity += gravity  # Faz o pássaro descer mais rápido
+                if game_over and event.key == pygame.K_r:
+                    game_over = False
+                    bird_y = HEIGHT // 2
+                    bird_velocity = 0
+                    score = 0
+                    coins_collected = 0
+                    comets.clear()
+                    coins.clear()
+                    comets.append(create_comet(bird_y))
+                    coins.append(create_coin())
+
+        if not game_over:
+            bird_velocity += gravity
+            bird_y += bird_velocity
+
+            # Gera novos cometas e moedas
+            if random.randint(1, 20) == 1:  # Aumentando a frequência dos cometas do tipo 1
+                comets.append(create_comet(bird_y))
+            if random.randint(1, 15) == 1:
+                coins.append(create_coin())
+
+            # Atualiza a posição dos cometas
+            for comet in comets:
+                comet['x'] += comet1_velocity if comet['type'] == 1 else comet2_velocity
+
+            # Atualiza a posição das moedas
+            for coin in coins:
+                coin['x'] -= 5
+
+            # Verifica se algum cometa colidiu com o pássaro
+            for comet in comets:
+                if check_collision(comet):
+                    game_over = True
+
+            # Verifica se alguma moeda foi coletada
+            for coin in coins[:]:
+                if check_coin_collision(coin):
+                    coins_collected += 1
+                    coins.remove(coin)
+                    score += 1
+
+            # Remove cometas e moedas fora da tela
+            comets = [comet for comet in comets if comet['x'] > -150]
+            coins = [coin for coin in coins if coin['x'] > -40]
+
+            # Desenha tudo
+            draw_bird()
+            for comet in comets:
+                draw_comet(comet)
+            for coin in coins:
+                draw_coin(coin)
+
+            # Exibe o score e moedas coletadas
+            font = pygame.font.SysFont(None, 30)
+            score_text = font.render(f'Score: {score}', True, WHITE)
+            coins_text = font.render(f'Coins: {coins_collected}', True, WHITE)
+            screen.blit(score_text, [10, 10])
+            screen.blit(coins_text, [10, 40])
+
+        else:
+            # Exibe a tela de Game Over
+            font = pygame.font.SysFont(None, 50)
+            game_over_text = font.render('Game Over!', True, WHITE)
+            restart_text = font.render('Press R to restart', True, WHITE)
+            screen.blit(game_over_text, [WIDTH // 3, HEIGHT // 3])
+            screen.blit(restart_text, [WIDTH // 4, HEIGHT // 3 + 50])
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+# Iniciando o jogo
+game()
+pygame.quit()
